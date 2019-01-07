@@ -1,10 +1,14 @@
 package com.LogicaBeans.LogicaEntityTest.controller;
 
+
 import java.util.List;
 
 import com.LogicaBeans.LogicaEntityTest.model.Topic;
 import com.LogicaBeans.LogicaEntityTest.services.implementation.TopicServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,8 +18,8 @@ public class TopicController {
 	private TopicServiceImpl topicServiceImpl;
 	
 	@GetMapping("/topic")
-	public List<Topic> getAllTopics(){
-		return topicServiceImpl.getAllTopics();
+	public Page<Topic> getAllTopics (@PageableDefault(page = 0,size = 10) Pageable pageable){
+		return topicServiceImpl.getAllTopics(pageable);
 	}
 	
 	@GetMapping("/topic/{id}")
@@ -23,7 +27,7 @@ public class TopicController {
 		return topicServiceImpl.getTopic(id);
 	}
 	
-	@RequestMapping(method=RequestMethod.POST, value="/addTopic")
+	@PostMapping(value="/addTopic")
 	public void addTopic(@RequestBody Topic topic) {
 		topicServiceImpl.addTopic(topic);
 	}

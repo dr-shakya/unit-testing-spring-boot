@@ -1,11 +1,13 @@
 package com.LogicaBeans.LogicaEntityTest.services;
 
 import com.LogicaBeans.LogicaEntityTest.model.Topic;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface TopicService {
-    public List<Topic> getAllTopics();
+    public Page<Topic> getAllTopics(Pageable pageable);
 
     public Topic getTopic(String id);
 
