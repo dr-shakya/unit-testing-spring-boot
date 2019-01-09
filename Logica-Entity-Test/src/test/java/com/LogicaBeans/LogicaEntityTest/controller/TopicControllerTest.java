@@ -16,6 +16,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -34,6 +38,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 
 
 @RunWith(SpringRunner.class)
@@ -48,17 +53,19 @@ public class TopicControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    List<Topic> topics;
+    Page<Topic> topicPage;
     Topic topic;
     String jsonMapper;
 
     @Before
     public void onInit(){
 //        mockMvc = MockMvcBuilders.standaloneSetup(topicController).build();
-        topics = new ArrayList<Topic>(Arrays.asList(
+        MockMvcBuilders.standaloneSetup().setCustomArgumentResolvers();
+        topicPage = new PageImpl<Topic>(new ArrayList<Topic>(Arrays.asList(
                 new Topic("java", "javaEE", "java desc"),
                 new Topic("python", "Django", "Django desc")
-        ));
+        )));
+
         topic = new Topic("java", "javaEE", "java desc");
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -68,15 +75,16 @@ public class TopicControllerTest {
         }
     }
 
-//    @Test
-//    public void getAllTopics_returnStatusOk() throws Exception{
-//        Mockito.when(topicServiceImpl.getAllTopics()).thenReturn(topics);
-//        this.mockMvc.perform(MockMvcRequestBuilders.get("/topic"))
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8));
-//        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/topic")).andReturn();
-//        System.out.println("Content: \n" + mvcResult.getResponse().getContentAsString());
-//    }
+    @Test
+    public void getAllTopics_returnStatusOk() throws Exception{
+//        Pageable pageable = PageRequest.of(0,2);
+        Mockito.when(topicServiceImpl.getAllTopics(any(Pageable.class))).thenReturn(topicPage);
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/topic"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8));
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/topic")).andReturn();
+        System.out.println("Content: \n" + mvcResult.getResponse().getContentAsString());
+    }
 
     @Test
     public void getTopic_returnStatusOk() throws Exception{
